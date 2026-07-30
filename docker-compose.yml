@@ -1,0 +1,67 @@
+# One-command local setup for reviewers — Postgres + backend + frontend.
+# No cloud accounts needed. Cloudinary is optional (image upload only); set the
+# CLOUDINARY_* vars in a .env next to this file to enable real uploads.
+#
+#   docker compose up --build
+#   # then, once, to load 50k demo rows:
+#   docker compose exec backend npm run seed
+#
+# App:  http://localhost:3000     API/docs: http://localhost:4000/api-docs
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: real_estate
+    ports:
+      - '5432:5432'
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build: ./backend
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: '4000'
+      CORS_ORIGIN: http://localhost:3000
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/real_estate?schema=public
+      DIRECT_URL: postgresql://postgres:postgres@db:5432/real_estate?schema=public
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:-dev-access-secret}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-dev-refresh-secret}
+      ACCESS_TOKEN_TTL: 15m
+      REFRESH_TOKEN_TTL: 7d
+      STORAGE_PROVIDER: cloudinary
+      CLOUDINARY_CLOUD_NAME: ${CLOUDINARY_CLOUD_NAME:-}
+      CLOUDINARY_API_KEY: ${CLOUDINARY_API_KEY:-}
+      CLOUDINARY_API_SECRET: ${CLOUDINARY_API_SECRET:-}
+      CLOUDINARY_FOLDER: real-estate
+    ports:
+      - '4000:4000'
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        BACKEND_URL: http://backend:4000
+        NEXT_PUBLIC_SITE_URL: http://localhost:3000
+    environment:
+      # Runtime: Server Components fetch the backend directly over the compose network.
+      BACKEND_URL: http://backend:4000
+      NEXT_PUBLIC_SITE_URL: http://localhost:3000
+    depends_on:
+      - backend
+    ports:
+      - '3000:3000'
+
+volumes:
+  pgdata:
