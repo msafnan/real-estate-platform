@@ -9,10 +9,12 @@ RUN apt-get update -y && apt-get install -y --no-install-recommends openssl ca-c
 
 WORKDIR /app
 
-# Install deps (dev deps included — NODE_ENV isn't "production" yet — needed for
-# the TypeScript build + prisma generate).
+# Install deps. --include=dev forces devDependencies (TypeScript, prisma CLI)
+# even if the builder sets NODE_ENV=production. --ignore-scripts skips the
+# @prisma/client postinstall (engine download) that crashes npm on the free-tier
+# builder — we run `prisma generate` explicitly right after instead.
 COPY package*.json ./
-RUN npm ci --no-audit --no-fund
+RUN npm ci --include=dev --ignore-scripts --no-audit --no-fund
 
 COPY prisma ./prisma
 RUN npx prisma generate
