@@ -1,0 +1,119 @@
+// Prisma schema — chosen ORM per DECISIONS.md D-8.
+// Datasource: PostgreSQL (the database). Prisma is only the query layer.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  // Direct (non-pooled) connection for Prisma Migrate. Falls back to
+  // DATABASE_URL if unset (e.g. a plain local Postgres without a pooler).
+  directUrl = env("DIRECT_URL")
+}
+
+enum PropertyType {
+  apartment
+  house
+  condo
+  townhouse
+  land
+  commercial
+}
+
+/// A registered user / account owner.
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  name         String
+  passwordHash String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  refreshTokens RefreshToken[]
+  properties    Property[]
+
+  @@map("users")
+}
+
+/// One row per issued refresh token. The raw token is NEVER stored — only its
+/// SHA-256 hash (D-3). Rotated on use: old row revoked, new one created.
+model RefreshToken {
+  id        String    @id @default(uuid())
+  tokenHash String    @unique
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId])
+  @@map("refresh_tokens")
+}
+
+/// A property listing.
+model Property {
+  id           String       @id @default(uuid())
+  ownerId      String       @map("owner_id")
+  owner        User         @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  title        String
+  description  String
+  price        Int // stored in whole currency units (e.g. USD)
+  city         String
+  propertyType PropertyType @map("property_type")
+  bedrooms     Int
+  bathrooms    Int
+  createdAt    DateTime     @default(now()) @map("created_at")
+  updatedAt    DateTime     @updatedAt @map("updated_at")
+
+  images    PropertyImage[]
+  inquiries Inquiry[]
+
+  // Index plan (Session 2). Single-column indexes for individual filters, a
+  // composite for the common filtered-search path, and created_at for sorting
+  // + keyset cursors (D-5, D-9). Verified with EXPLAIN ANALYZE in Session 5.
+  @@index([city])
+  @@index([propertyType])
+  @@index([price])
+  @@index([city, propertyType, price])
+  @@index([createdAt])
+  @@map("properties")
+}
+
+/// Image belonging to a property. Only the URL is stored — binaries live in
+/// cloud object storage (D-4).
+model PropertyImage {
+  id         String   @id @default(uuid())
+  propertyId String   @map("property_id")
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  url        String
+  /// Cloudinary public_id — kept so the asset can be removed from storage when
+  /// the image/property is deleted (null for seeded placeholder images).
+  publicId   String?  @map("public_id")
+  position   Int      @default(0)
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@index([propertyId])
+  @@map("property_images")
+}
+
+/// A lead / inquiry submitted against a property listing.
+model Inquiry {
+  id            String   @id @default(uuid())
+  propertyId    String   @map("property_id")
+  property      Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  inquirerName  String   @map("inquirer_name")
+  inquirerEmail String   @map("inquirer_email")
+  inquirerPhone String?  @map("inquirer_phone")
+  message       String
+  createdAt     DateTime @default(now()) @map("created_at")
+  /// Date-only stamp used by the daily-duplicate unique constraint below.
+  createdDate   DateTime @default(now()) @map("created_date") @db.Date
+
+  // Duplicate prevention (Session 7): at most one inquiry per property, per
+  // email, per calendar day — enforced authoritatively by the database.
+  @@unique([propertyId, inquirerEmail, createdDate], name: "uniq_inquiry_per_day")
+  @@index([propertyId])
+  @@map("inquiries")
+}
