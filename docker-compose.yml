@@ -26,7 +26,9 @@ services:
       retries: 10
 
   backend:
-    build: ./backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.compose
     depends_on:
       db:
         condition: service_healthy
