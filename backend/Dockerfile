@@ -17,8 +17,8 @@ COPY package*.json ./
 # --maxsockets 3 lowers memory pressure (fewer parallel fetches); the retry
 # rides out the intermittent "Exit handler never called" npm crash that hits
 # memory-starved Docker builders (e.g. Render free).
-RUN npm ci --include=dev --ignore-scripts --no-audit --no-fund --maxsockets 3 \
- || npm ci --include=dev --ignore-scripts --no-audit --no-fund --maxsockets 3
+RUN npm ci --include=dev --ignore-scripts --no-audit --no-fund --maxsockets 3 --legacy-peer-deps \
+ || npm ci --include=dev --ignore-scripts --no-audit --no-fund --maxsockets 3 --legacy-peer-deps
 
 COPY prisma ./prisma
 RUN npx prisma generate
