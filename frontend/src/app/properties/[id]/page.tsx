@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { BlurImage } from '../../../components/BlurImage';
 import { InquiryForm } from '../../../components/InquiryForm';
 import { OwnerActions } from '../../../components/OwnerActions';
 import { PropertyCard } from '../../../components/PropertyCard';
@@ -120,22 +121,22 @@ function Gallery({ images, title }: { images: string[]; title: string }) {
   }
   return (
     <div className="space-y-2">
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={images[0]}
-        alt={title}
-        className="aspect-video w-full rounded-lg object-cover"
-      />
+      <div className="aspect-video w-full overflow-hidden rounded-lg bg-gray-100">
+        <BlurImage src={images[0]} alt={title} eager className="h-full w-full object-cover" />
+      </div>
       {images.length > 1 && (
         <div className="grid grid-cols-4 gap-2">
           {images.slice(1, 5).map((url, i) => (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
+            <div
               key={i}
-              src={url}
-              alt={`${title} ${i + 2}`}
-              className="aspect-square w-full rounded-md object-cover"
-            />
+              className="aspect-square w-full overflow-hidden rounded-md bg-gray-100"
+            >
+              <BlurImage
+                src={url}
+                alt={`${title} ${i + 2}`}
+                className="h-full w-full object-cover"
+              />
+            </div>
           ))}
         </div>
       )}

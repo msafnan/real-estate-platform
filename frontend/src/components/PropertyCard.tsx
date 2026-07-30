@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { BlurImage } from './BlurImage';
 import { formatPrice, titleCase } from '../lib/format';
 import { PropertyCard as PropertyCardType } from '../lib/types';
 
@@ -11,12 +12,10 @@ export function PropertyCard({ property }: { property: PropertyCardType }) {
     >
       <div className="aspect-[4/3] w-full overflow-hidden bg-gray-100">
         {cover ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
+          <BlurImage
             src={cover}
             alt={property.title}
-            className="h-full w-full object-cover transition group-hover:scale-105"
-            loading="lazy"
+            className="h-full w-full object-cover group-hover:scale-105"
           />
         ) : (
           <div className="flex h-full items-center justify-center text-gray-400">No image</div>

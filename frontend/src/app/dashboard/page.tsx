@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
+import { BlurImage } from '../../components/BlurImage';
 import { ProtectedRoute } from '../../components/ProtectedRoute';
 import { Button, ErrorMessage, Spinner } from '../../components/ui';
 import { useAuth } from '../../context/AuthContext';
@@ -72,8 +73,7 @@ function Dashboard() {
             <div key={p.id} className="flex items-center gap-4 p-4">
               <div className="h-16 w-20 shrink-0 overflow-hidden rounded bg-gray-100">
                 {p.images?.[0]?.url && (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={p.images[0].url} alt="" className="h-full w-full object-cover" />
+                  <BlurImage src={p.images[0].url} alt="" className="h-full w-full object-cover" />
                 )}
               </div>
               <div className="min-w-0 flex-1">
