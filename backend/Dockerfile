@@ -14,7 +14,11 @@ WORKDIR /app
 # @prisma/client postinstall (engine download) that crashes npm on the free-tier
 # builder — we run `prisma generate` explicitly right after instead.
 COPY package*.json ./
-RUN npm ci --include=dev --ignore-scripts --no-audit --no-fund
+# --maxsockets 3 lowers memory pressure (fewer parallel fetches); the retry
+# rides out the intermittent "Exit handler never called" npm crash that hits
+# memory-starved Docker builders (e.g. Render free).
+RUN npm ci --include=dev --ignore-scripts --no-audit --no-fund --maxsockets 3 \
+ || npm ci --include=dev --ignore-scripts --no-audit --no-fund --maxsockets 3
 
 COPY prisma ./prisma
 RUN npx prisma generate
