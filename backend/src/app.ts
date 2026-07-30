@@ -13,6 +13,11 @@ import apiRoutes from './routes';
 export function createApp(): Application {
   const app = express();
 
+  // Behind a reverse proxy (Vercel/Render) in production: trust the first proxy
+  // hop so req.ip reflects the real client (correct rate-limiting) and Secure
+  // cookies work. Left off in dev (direct connections).
+  if (env.isProd) app.set('trust proxy', 1);
+
   // Security + parsing baseline (D-13).
   app.use(helmet());
   app.use(
