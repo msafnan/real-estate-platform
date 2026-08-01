@@ -17,6 +17,30 @@ export const PROPERTY_TYPES: PropertyType[] = [
   'commercial',
 ];
 
+/** Cities available in the seed data — used for the location filter dropdown. */
+export const CITIES: string[] = [
+  'Atlanta',
+  'Austin',
+  'Boston',
+  'Charlotte',
+  'Chicago',
+  'Columbus',
+  'Dallas',
+  'Denver',
+  'Houston',
+  'Miami',
+  'Minneapolis',
+  'Nashville',
+  'Orlando',
+  'Phoenix',
+  'Portland',
+  'Raleigh',
+  'Sacramento',
+  'San Diego',
+  'Seattle',
+  'Tampa',
+];
+
 export interface PropertyImage {
   id: string;
   url: string;
