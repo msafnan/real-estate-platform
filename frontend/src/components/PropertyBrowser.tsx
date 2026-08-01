@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { ApiError, buildSearchQuery } from '../lib/api';
 import { API_URL } from '../lib/config';
-import { PROPERTY_TYPES, Paginated, PropertyCard as Card, SearchFilters, SortOption } from '../lib/types';
+import { CITIES, PROPERTY_TYPES, Paginated, PropertyCard as Card, SearchFilters, SortOption } from '../lib/types';
 import { titleCase } from '../lib/format';
 import { PropertyCard } from './PropertyCard';
 import { Button, ErrorMessage, Field, Input, Select, Spinner } from './ui';
@@ -70,11 +70,17 @@ export function PropertyBrowser() {
       {/* Filters */}
       <div className="grid grid-cols-2 gap-3 rounded-lg border border-gray-200 bg-white p-4 md:grid-cols-6">
         <Field label="City">
-          <Input
-            placeholder="Any"
+          <Select
             value={filters.city ?? ''}
             onChange={(e) => setFilters((f) => ({ ...f, city: e.target.value || undefined }))}
-          />
+          >
+            <option value="">Any</option>
+            {CITIES.map((c) => (
+              <option key={c} value={c}>
+                {c}
+              </option>
+            ))}
+          </Select>
         </Field>
         <Field label="Type">
           <Select

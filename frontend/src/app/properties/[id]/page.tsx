@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import { BlurImage } from '../../../components/BlurImage';
 import { InquiryForm } from '../../../components/InquiryForm';
 import { OwnerActions } from '../../../components/OwnerActions';
+import { OwnerInquiries } from '../../../components/OwnerInquiries';
 import { PropertyCard } from '../../../components/PropertyCard';
 import { ApiError, getProperty, getSimilar } from '../../../lib/api';
 import { formatPrice, titleCase } from '../../../lib/format';
@@ -82,6 +83,7 @@ export default async function PropertyDetailPage({ params }: Params) {
             <span>{property.bathrooms} bathrooms</span>
           </div>
           <OwnerActions propertyId={property.id} ownerId={property.ownerId} />
+          <OwnerInquiries propertyId={property.id} ownerId={property.ownerId} />
           <div>
             <h2 className="mb-2 text-lg font-semibold">Description</h2>
             <p className="whitespace-pre-line text-gray-700">{property.description}</p>

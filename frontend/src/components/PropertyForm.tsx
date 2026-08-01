@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { FormEvent, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { titleCase } from '../lib/format';
-import { PROPERTY_TYPES, Property, PropertyType } from '../lib/types';
+import { CITIES, PROPERTY_TYPES, Property, PropertyType } from '../lib/types';
 import { Button, ErrorMessage, Field, Input, Select } from './ui';
 
 interface Props {
@@ -123,7 +123,20 @@ export function PropertyForm({ mode, initial }: Props) {
           <Input type="number" value={form.price} onChange={set('price')} />
         </Field>
         <Field label="City">
-          <Input value={form.city} onChange={set('city')} />
+          <Select value={form.city} onChange={set('city')}>
+            <option value="" disabled>
+              Select a city
+            </option>
+            {/* Keep an out-of-list value (e.g. a legacy listing's city) selectable. */}
+            {form.city && !CITIES.includes(form.city) && (
+              <option value={form.city}>{form.city}</option>
+            )}
+            {CITIES.map((c) => (
+              <option key={c} value={c}>
+                {c}
+              </option>
+            ))}
+          </Select>
         </Field>
         <Field label="Type">
           <Select value={form.propertyType} onChange={set('propertyType')}>

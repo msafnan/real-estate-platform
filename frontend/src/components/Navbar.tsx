@@ -15,7 +15,10 @@ export function Navbar() {
         </Link>
 
         <div className="flex items-center gap-3 text-sm">
-          <Link href="/properties" className="text-gray-600 hover:text-gray-900">
+          <Link
+            href="/properties"
+            className="rounded-full px-3 py-1.5 font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900"
+          >
             Browse
           </Link>
 
@@ -35,11 +38,14 @@ export function Navbar() {
             </>
           ) : (
             <>
-              <Link href="/login" className="text-gray-600 hover:text-gray-900">
+              <Link
+                href="/login"
+                className="rounded-full px-3 py-1.5 font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900"
+              >
                 Log in
               </Link>
               <Link href="/register">
-                <Button>Sign up</Button>
+                <Button className="rounded-full shadow-sm hover:shadow-md">Sign up</Button>
               </Link>
             </>
           )}
