@@ -1,12 +1,14 @@
 'use client';
 
 import { FormEvent, useState } from 'react';
+import { useAuth } from '../context/AuthContext';
 import { API_URL } from '../lib/config';
 import { Button, ErrorMessage, Field, Input, SuccessMessage } from './ui';
 
 type State = 'idle' | 'sending' | 'sent' | 'duplicate' | 'error';
 
-export function InquiryForm({ propertyId }: { propertyId: string }) {
+export function InquiryForm({ propertyId, ownerId }: { propertyId: string; ownerId?: string }) {
+  const { user } = useAuth();
   const [form, setForm] = useState({
     inquirerName: '',
     inquirerEmail: '',
@@ -16,6 +18,10 @@ export function InquiryForm({ propertyId }: { propertyId: string }) {
   });
   const [state, setState] = useState<State>('idle');
   const [error, setError] = useState('');
+
+  // Owners don't inquire on their own listing — hide the form for them.
+  // (Checked after hooks so hook order stays consistent across renders.)
+  if (user && ownerId && user.id === ownerId) return null;
 
   const set = (k: keyof typeof form) => (e: { target: { value: string } }) =>
     setForm((f) => ({ ...f, [k]: e.target.value }));
@@ -52,16 +58,20 @@ export function InquiryForm({ propertyId }: { propertyId: string }) {
     }
   }
 
+  const card = (children: React.ReactNode) => (
+    <div className="rounded-lg border border-gray-200 bg-white p-5">{children}</div>
+  );
+
   if (state === 'sent') {
-    return <SuccessMessage message="Inquiry sent! The owner will get back to you." />;
+    return card(<SuccessMessage message="Inquiry sent! The owner will get back to you." />);
   }
   if (state === 'duplicate') {
-    return (
-      <SuccessMessage message="You've already sent an inquiry for this property today." />
+    return card(
+      <SuccessMessage message="You've already sent an inquiry for this property today." />,
     );
   }
 
-  return (
+  return card(
     <form onSubmit={onSubmit} className="space-y-3">
       <h3 className="text-lg font-semibold">Contact the owner</h3>
       <Field label="Name">
@@ -96,6 +106,6 @@ export function InquiryForm({ propertyId }: { propertyId: string }) {
       <Button type="submit" disabled={state === 'sending'} className="w-full">
         {state === 'sending' ? 'Sending…' : 'Send inquiry'}
       </Button>
-    </form>
+    </form>,
   );
 }
