@@ -92,9 +92,7 @@ export default async function PropertyDetailPage({ params }: Params) {
 
         {/* Sidebar: inquiry */}
         <aside className="lg:col-span-1">
-          <div className="rounded-lg border border-gray-200 bg-white p-5">
-            <InquiryForm propertyId={property.id} />
-          </div>
+          <InquiryForm propertyId={property.id} ownerId={property.ownerId} />
         </aside>
       </div>
 
