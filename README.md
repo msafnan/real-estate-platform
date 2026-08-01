@@ -7,9 +7,8 @@ Monorepo-style two-folder project:
 | `backend/`  | Node + Express + TypeScript + Prisma/Postgres  | `npm run dev` (→ http://localhost:4000) |
 | `frontend/` | Next.js (App Router) + TypeScript + Tailwind   | `npm run dev` (→ http://localhost:3000) |
 
-Architecture rationale lives in [`DECISIONS.md`](./DECISIONS.md). The session-by-session
-build plan lives in [`CLAUDE.md`](./CLAUDE.md). Search/index/load-test results are in
-[`docs/PERFORMANCE.md`](./docs/PERFORMANCE.md).
+Architecture rationale lives in [`DECISIONS.md`](./DECISIONS.md). Search/index/load-test
+results are in [`docs/PERFORMANCE.md`](./docs/PERFORMANCE.md).
 
 ## Getting started
 
