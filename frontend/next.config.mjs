@@ -1,7 +1,8 @@
 /** @type {import('next').NextConfig} */
 
 // Backend origin the /api proxy forwards to (server-side only).
-const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:4000';
+// Strip any trailing slash so `${BACKEND_URL}/api/...` never becomes `//api`.
+const BACKEND_URL = (process.env.BACKEND_URL || 'http://localhost:4000').replace(/\/+$/, '');
 
 const nextConfig = {
   reactStrictMode: true,

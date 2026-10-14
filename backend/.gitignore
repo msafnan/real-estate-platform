@@ -8,3 +8,6 @@ coverage/
 
 # Prisma
 prisma/*.db
+
+# WhatsApp session (secret — do not commit)
+auth_info_baileys/
